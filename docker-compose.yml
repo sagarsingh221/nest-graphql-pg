@@ -1,0 +1,38 @@
+version: '3.7'
+
+services:
+  main:
+    container_name: whiteboard_server
+    build:
+      context: .
+      target: BUILD_IMAGE
+    volumes:
+      - .:/whiteboard/app
+      - /whiteboard/app/node_modules
+    ports:
+      - 3000:3000
+    command: npm run start:dev
+    env_file:
+      - .env
+      - docker.env
+    networks:
+      - whiteboard
+    depends_on:
+      - db_pg
+
+  db_pg:
+    image: postgres:12
+    container_name: whiteboard_db
+    ports:
+      - 5432:5432
+    environment:
+      - TZ=${TZ}
+      - PGTZ=${TZ}
+      - POSTGRES_USER=${DATABASE_USER}
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
+    networks:
+      - whiteboard
+
+networks:
+  whiteboard:
+    name: whiteboard-network
